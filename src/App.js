@@ -14,11 +14,12 @@ function App() {
   return (
     <div className="App">
       { !userId && <UserLogin/> }
-      {  userId && <React.Fragment>
+      { userId &&  <React.Fragment>
                     <Navigation />
                     <main>
                       <Route path="/" component={EventList} exact />
                       <Route path="/eventForm" component={EventForm} />
+                      <Route path="/updateEvent" component={EventForm} />
                     </main>
                   </React.Fragment>
       }

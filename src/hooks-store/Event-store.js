@@ -3,7 +3,6 @@ import { initStore } from './Store';
 const configureStore = () => {
     const actions = {
         ADD_EVENT : (curState, payload) => {
-            console.log('ADD');
             const updatedEvents = [...curState.events];
             updatedEvents.push({
                 title : payload.title,
@@ -15,7 +14,20 @@ const configureStore = () => {
                 eventId : payload.eventId,
                 userId: payload.userId
             });
-            console.log("upadte ",updatedEvents);
+            return { events : updatedEvents };
+        },
+        UPDATE_EVENT : (curState, payload) => {
+            const eventIndex = curState.events.findIndex( e => e.eventId === payload.eventId);
+            const updatedEvents = [...curState.events];
+            updatedEvents[eventIndex] = {
+                ...curState.events[eventIndex],
+                title : payload.title,
+                venue : payload.venue,
+                description : payload.description,
+                date : payload.date,
+                startTime : payload.startTime,
+                endTime : payload.endTime
+            };
             return { events : updatedEvents };
         }
     };

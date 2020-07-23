@@ -1,8 +1,9 @@
-import React, { useReducer, useCallback } from 'react';
+import React, { useReducer, useCallback, useEffect, useContext } from 'react';
 import './eventForm.css'
 import Card from '../UI/Card/Card';
 import { useStore } from '../../hooks-store/Store';
-import { useHistory } from "react-router-dom";
+import { useHistory } from 'react-router-dom';
+import { UserLoginContext } from '../../context/UserLoginContext';
 
 const eventReducer = (state,action)=>{
 
@@ -37,6 +38,26 @@ const eventReducer = (state,action)=>{
                 ...state,
                 endTime : action.endTime
             }
+        case 'PEVIOUS_EVENT_VALUES':
+            const payload = action.payload;
+            return {
+                ...state,
+                title : payload.title,
+                venue : payload.venue,
+                description : payload.description,
+                date : payload.date,
+                startTime : payload.startTime,
+                endTime : payload.endTime,
+                userId : payload.userId,
+                eventId : payload.eventId
+            }
+        case 'SET_ID':
+            console.log('id',action.eventId)
+            return {
+                ...state,
+                userId : action.userId,
+                eventId : action.eventId
+            }
         default:
             return state;
     }
@@ -46,9 +67,8 @@ const eventReducer = (state,action)=>{
 const EventForm = React.memo(props => {
 
     const history = useHistory();
-
     const [ eventState, dispatch ] = useStore();
-
+    const { userId } = useContext(UserLoginContext);
     const [ eventElements, setEventElements ] = useReducer(eventReducer,{
                                                                             title : '',
                                                                             venue : '',
@@ -60,6 +80,15 @@ const EventForm = React.memo(props => {
                                                                             eventId : ''
 
                                                                         });
+
+    useEffect(()=>{
+        if(history.location.state){
+            setEventElements({ type : 'PEVIOUS_EVENT_VALUES', payload : history.location.state});
+        }else{
+            const eventSize = eventState.events.length + 1;
+            setEventElements({ type : 'SET_ID', userId : userId, eventId : eventSize})
+        }
+    },[history.location.state,userId,eventState.events.length]);
 
     const titleHandler = useCallback(event => {
         setEventElements({ type : 'ADD_TITLE', title : event.target.value});
@@ -93,11 +122,18 @@ const EventForm = React.memo(props => {
 
     const submitHandler = useCallback(event => {
         event.preventDefault();
-        dispatch('ADD_EVENT', eventElements);
-        alert('Event Added');
-        history.push('/');
-        
-    },[eventElements,dispatch]);
+        if(!history.location.state){
+            console.log("events", eventElements.userId, eventElements.eventId);
+            dispatch('ADD_EVENT', eventElements);
+            alert('Event Added');
+            history.replace('/');
+        }
+        else{
+            dispatch('UPDATE_EVENT', eventElements);
+            alert('Event Updated');
+            history.replace('/');
+        }
+    },[eventElements,dispatch,history]);
 
     return(
         <div className="container">
@@ -107,7 +143,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="title">Title</label>
                         </div>
-                        <div className="col-75">
+                        <div className="col-45">
                             <input
                                 type="text"
                                 id="title"
@@ -120,7 +156,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="venue">Venue</label>
                         </div>
-                        <div className="col-75">
+                        <div className="col-45">
                             <input
                                 type="text"
                                 id="venue"
@@ -133,7 +169,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="description">Description</label>
                         </div>
-                        <div className="col-75">
+                        <div className="col-45">
                             <textarea
                                 type="text"
                                 id="description"
@@ -146,7 +182,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="date">Date </label>
                         </div>
-                        <div className="col-75">   
+                        <div className="col-30">   
                             <input
                                 type="date"
                                 id="date"
@@ -159,7 +195,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="startTime">Start Time </label>
                         </div>
-                        <div className="col-75">   
+                        <div className="col-30">   
                             <input
                                 type="time"
                                 id="startTime"
@@ -172,7 +208,7 @@ const EventForm = React.memo(props => {
                         <div className="col-25">
                             <label for="endTime">End Time </label>
                         </div>
-                        <div className="col-75">   
+                        <div className="col-30">   
                             <input
                                 type="time"
                                 id="endTime"
@@ -181,13 +217,15 @@ const EventForm = React.memo(props => {
                             />
                         </div>
                     </div>
+                    <br/>
                     <div className="row">
                         <button
                             className="button"
                             type='button'
                             onClick={submitHandler}
                         >
-                            Submit
+                            { history.location.state && 'Modify' }
+                            { !history.location.state && 'Create' }
                         </button>
                     </div>  
                 </form>

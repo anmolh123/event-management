@@ -37,16 +37,22 @@
   
   .col-25 {
     float: left;
+    width: 45%;
+    margin-top: 6px;
+  }
+  
+  .col-45 {
+    float: left;
+    width: 45%;
+    margin-top: 6px;
+  }
+  
+  .col-30 {
+    float: left;
     width: 25%;
     margin-top: 6px;
   }
-  
-  .col-75 {
-    float: left;
-    width: 75%;
-    margin-top: 6px;
-  }
-  
+
   /* Clear floats after the columns */
   .row:after {
     content: "";

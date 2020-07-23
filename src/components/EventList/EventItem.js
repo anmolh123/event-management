@@ -2,9 +2,11 @@ import React, { useCallback, useState } from 'react';
 import Card from '../UI/Card/Card';
 import './eventItem.css'
 import Modal from '../UI/Modal/Modal';
+import { useHistory } from "react-router-dom";
 
 const EventItem = React.memo(props => {
 
+  const history = useHistory();
   const [ show, setshow ] = useState(false);
 
   const popDetail = useCallback(()=>{
@@ -14,6 +16,11 @@ const EventItem = React.memo(props => {
   const closeModal = useCallback(()=>{
     setshow(false);
   },[]);
+
+  const updateHandle = useCallback(()=>{
+    console.log(props.detail);
+    history.replace('/updateEvent',props.detail);
+  },[props.detail,history]);
 
   return (
     <Card style={{ marginBottom: '1rem' }} >
@@ -27,7 +34,7 @@ const EventItem = React.memo(props => {
           <p>Date - {props.detail.date} </p>
           <p>Start Time - {props.detail.startTime}</p> 
           <p>End Time - {props.detail.endTime}</p>
-          <button type="button"> Update </button>
+          <button type="button" onClick={updateHandle}> Update </button>
           {"  "}
         </Modal>
     </Card>

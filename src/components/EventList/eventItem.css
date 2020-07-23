@@ -10,4 +10,6 @@
 .event-item p {
   margin: 0.25rem 0;
 }
+
+.event-item { cursor: pointer; }
   
