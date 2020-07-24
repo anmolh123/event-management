@@ -1,6 +1,9 @@
 import React, { useState, useCallback } from 'react';
 
-export const UserLoginContext = React.createContext();
+export const UserLoginContext = React.createContext({
+  userId: null,
+  setUserId: (id) => {}
+});
 
 export default props => {
   const [userLoginId, setUserLoginId] = useState(null);

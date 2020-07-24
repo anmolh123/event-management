@@ -52,7 +52,6 @@ const eventReducer = (state,action)=>{
                 eventId : payload.eventId
             }
         case 'SET_ID':
-            console.log('id',action.eventId)
             return {
                 ...state,
                 userId : action.userId,
@@ -77,7 +76,8 @@ const EventForm = React.memo(props => {
                                                                             startTime : '',
                                                                             endTime : '',
                                                                             userId : '',
-                                                                            eventId : ''
+                                                                            eventId : '',
+                                                                            isOpted : false
 
                                                                         });
 
@@ -92,38 +92,31 @@ const EventForm = React.memo(props => {
 
     const titleHandler = useCallback(event => {
         setEventElements({ type : 'ADD_TITLE', title : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const venueHandler = useCallback(event => {
         setEventElements({ type : 'ADD_VENUE', venue : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const descriptionHandler = useCallback(event => {
         setEventElements({ type : 'ADD_DESCRIPTION', description : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const dateHandler = useCallback(event => {
         setEventElements({ type : 'ADD_DATE', date : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const startTimeHandler = useCallback(event => {
         setEventElements({ type : 'ADD_START_TIME', startTime : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const endTimeHandler = useCallback(event => {
         setEventElements({ type : 'ADD_END_TIME', endTime : event.target.value});
-        console.log(event.target.value);
     },[]);
 
     const submitHandler = useCallback(event => {
         event.preventDefault();
         if(!history.location.state){
-            console.log("events", eventElements.userId, eventElements.eventId);
             dispatch('ADD_EVENT', eventElements);
             alert('Event Added');
             history.replace('/');
@@ -141,7 +134,7 @@ const EventForm = React.memo(props => {
                 <form>
                     <div className="row">
                         <div className="col-25">
-                            <label for="title">Title</label>
+                            <label htmlFor="title">Title</label>
                         </div>
                         <div className="col-45">
                             <input
@@ -154,7 +147,7 @@ const EventForm = React.memo(props => {
                     </div>
                     <div className="row">
                         <div className="col-25">
-                            <label for="venue">Venue</label>
+                            <label htmlFor="venue">Venue</label>
                         </div>
                         <div className="col-45">
                             <input
@@ -167,7 +160,7 @@ const EventForm = React.memo(props => {
                     </div>
                     <div className="row">
                         <div className="col-25">
-                            <label for="description">Description</label>
+                            <label htmlFor="description">Description</label>
                         </div>
                         <div className="col-45">
                             <textarea
@@ -180,7 +173,7 @@ const EventForm = React.memo(props => {
                     </div> 
                     <div className="row">
                         <div className="col-25">
-                            <label for="date">Date </label>
+                            <label htmlFor="date">Date </label>
                         </div>
                         <div className="col-30">   
                             <input
@@ -193,7 +186,7 @@ const EventForm = React.memo(props => {
                     </div>
                     <div className="row">
                         <div className="col-25">
-                            <label for="startTime">Start Time </label>
+                            <label htmlFor="startTime">Start Time </label>
                         </div>
                         <div className="col-30">   
                             <input
@@ -206,7 +199,7 @@ const EventForm = React.memo(props => {
                     </div>
                     <div className="row">
                         <div className="col-25">
-                            <label for="endTime">End Time </label>
+                            <label htmlFor="endTime">End Time </label>
                         </div>
                         <div className="col-30">   
                             <input

@@ -14,6 +14,12 @@ const Navigation = props => {
           <li>
             <NavLink to="/eventForm">Create Event</NavLink>
           </li>
+          <li>
+            <NavLink to="/myEvents">My Event</NavLink>
+          </li>
+          <li>
+            <NavLink to="/optedEvents">Opted Events</NavLink>
+          </li>
         </ul>
       </nav>
     </header>

@@ -1,13 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import Card from '../UI/Card/Card';
 import './eventItem.css'
 import Modal from '../UI/Modal/Modal';
 import { useHistory } from "react-router-dom";
+import { UserLoginContext } from "../../context/UserLoginContext";
 
 const EventItem = React.memo(props => {
 
   const history = useHistory();
   const [ show, setshow ] = useState(false);
+  const { userId } = useContext(UserLoginContext);
 
   const popDetail = useCallback(()=>{
     setshow(true);
@@ -18,9 +20,15 @@ const EventItem = React.memo(props => {
   },[]);
 
   const updateHandle = useCallback(()=>{
-    console.log(props.detail);
     history.replace('/updateEvent',props.detail);
   },[props.detail,history]);
+
+  const isOptedhandler = useCallback(()=>{
+    props.toggle(props.id);
+    const message = props.detail.isOpted ? 'Opted Out' : 'Opted In';
+    alert(message);
+    setshow(false);
+  },[props])
 
   return (
     <Card style={{ marginBottom: '1rem' }} >
@@ -34,7 +42,8 @@ const EventItem = React.memo(props => {
           <p>Date - {props.detail.date} </p>
           <p>Start Time - {props.detail.startTime}</p> 
           <p>End Time - {props.detail.endTime}</p>
-          <button type="button" onClick={updateHandle}> Update </button>
+          { userId === props.detail.userId && <button type="button" onClick={updateHandle}> Update </button>}
+          { userId !== props.detail.userId && <button type="button" onClick={isOptedhandler}> { props.detail.isOpted ? 'Opt-out' : 'Opt-in'} </button>}
           {"  "}
         </Modal>
     </Card>

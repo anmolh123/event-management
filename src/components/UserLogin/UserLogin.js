@@ -7,7 +7,7 @@ const UserLogin = React.memo(props => {
 
     const [ userName, setUserName ] = useState('');
     const [ password, setPassword ] = useState('');
-    const { userId, setUserId } = useContext(UserLoginContext);
+    const { setUserId } = useContext(UserLoginContext);
 
     const userNameHandler = useCallback(event => {
         setUserName(event.target.value);
@@ -19,17 +19,15 @@ const UserLogin = React.memo(props => {
 
     const loginHandler = useCallback(event =>{
         event.preventDefault();
-        console.log(userId);
         if(userName === 'dummy' && password === 'dummy'){
-            console.log('login');
-            setUserId('123456');
+            setUserId(123456);
         }else{
             alert('Login Failed');
             setUserName('');
             setPassword('');
         }
 
-    },[userName, password, userId, setUserId]);
+    },[userName, password, setUserId]);
 
     return (
         <section className="login-form">
@@ -40,6 +38,7 @@ const UserLogin = React.memo(props => {
                 <input
                     type="text"
                     id="userName"
+                    autoComplete="off"
                     value={userName}
                     onChange={userNameHandler} 
                 />
@@ -49,6 +48,7 @@ const UserLogin = React.memo(props => {
                 <input
                     type="password"
                     id="password"
+                    autoComplete="off"
                     value={password}
                     onChange={passwordHandler}
                 />
