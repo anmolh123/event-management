@@ -27,7 +27,9 @@ export const useStore = (shouldListen = true) => {
       }
     };
   }, [setState, shouldListen]);
-
+  
+  localStorage.setItem('event-store',JSON.stringify(globalState));
+  
   return [globalState, dispatch];
 };
 

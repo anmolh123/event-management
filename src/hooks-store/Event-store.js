@@ -1,4 +1,5 @@
 import { initStore } from './Store';
+let eventObj = null;
 
 const configureStore = () => {
     const actions = {
@@ -42,54 +43,62 @@ const configureStore = () => {
             return { events: updatedEvents };
           }
     };
-    initStore(actions, {
-      events: [
-                {
-                    date: "2020-07-28",
-                    description: "the greatest circus ever",
-                    endTime: "01:49",
-                    eventId: 1,
-                    startTime: "23:47",
-                    title: "Circus",
-                    userId: 333333,
-                    venue: "circus central",
-                    isOpted : false
-                },
-                {
-                    date: "2020-07-26",
-                    description: "the greatest show ever",
-                    endTime: "03:49",
-                    eventId: 2,
-                    startTime: "21:47",
-                    title: "Dark Premier",
-                    userId: 123456,
-                    venue: "apex central",
-                    isOpted : false
-                },
-                {
-                    date: "2020-07-24",
-                    description: "the greatest gala ever",
-                    endTime: "04:49",
-                    eventId: 3,
-                    startTime: "18:47",
-                    title: "Gala",
-                    userId: 333339,
-                    venue: "gala central",
-                    isOpted : false
-                },
-                {
-                    date: "2020-07-25",
-                    description: "the greatest gazing ever",
-                    endTime: "09:49",
-                    eventId: 4,
-                    startTime: "16:47",
-                    title: "Sky gazing",
-                    userId: 333339,
-                    venue: "gaze central",
-                    isOpted : false
-                }
-      ]
-    });
+
+    eventObj = localStorage.getItem('event-store');
+    if(eventObj !== null){
+    eventObj = JSON.parse(eventObj);
+    }
+    else{
+    eventObj = {
+        events: [
+                    {
+                        date: "2020-07-28",
+                        description: "the greatest circus ever",
+                        endTime: "01:49",
+                        eventId: 1,
+                        startTime: "23:47",
+                        title: "Circus",
+                        userId: 333333,
+                        venue: "circus central",
+                        isOpted : false
+                    },
+                    {
+                        date: "2020-07-26",
+                        description: "the greatest show ever",
+                        endTime: "03:49",
+                        eventId: 2,
+                        startTime: "21:47",
+                        title: "Dark Premier",
+                        userId: 123456,
+                        venue: "apex central",
+                        isOpted : false
+                    },
+                    {
+                        date: "2020-07-24",
+                        description: "the greatest gala ever",
+                        endTime: "04:49",
+                        eventId: 3,
+                        startTime: "18:47",
+                        title: "Gala",
+                        userId: 333339,
+                        venue: "gala central",
+                        isOpted : false
+                    },
+                    {
+                        date: "2020-07-25",
+                        description: "the greatest gazing ever",
+                        endTime: "09:49",
+                        eventId: 4,
+                        startTime: "16:47",
+                        title: "Sky gazing",
+                        userId: 333339,
+                        venue: "gaze central",
+                        isOpted : false
+                    }
+            ]
+        }
+    }
+    initStore(actions, eventObj );
   };
   
   export default configureStore;
