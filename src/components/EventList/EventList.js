@@ -1,8 +1,10 @@
-import React, { useContext, useCallback, useMemo, useState, useEffect } from 'react';
+import React, { useContext, useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import EventItem from './EventItem';
 import { useStore } from '../../hooks-store/Store';
 import './eventList.css';
 import { UserLoginContext } from "../../context/UserLoginContext";
+import { useHistory } from "react-router-dom";
+import { useToasts } from 'react-toast-notifications';
 
 const EventList = props => {
   const itemCount = 5;
@@ -11,6 +13,21 @@ const EventList = props => {
   const [ events, setEvents ] = useState([]);
   const [ pageStartIndex, setPageStartIndex ] = useState(0);
   const [ pageEndIndex, setPageEndIndex ] = useState(itemCount);
+  const nextButton = useRef(false);
+  const previousButton = useRef(false);
+  const history = useHistory();
+  const { addToast, removeAllToasts } = useToasts();
+
+  useEffect(()=>{
+    if(history.location.state){
+      removeAllToasts();
+      addToast('Event ' + history.location.state.type,{
+        appearance: 'success',
+        autoDismiss: true,
+        autoDismissTimeout: 2000,
+      })
+    }
+  },[history.location,addToast,removeAllToasts])
 
   const filterEvents = useMemo(()=>{
     switch(props.filter){
@@ -27,21 +44,18 @@ const EventList = props => {
     let updatedEvents = filterEvents;
     let slicedEvents = updatedEvents.slice(pageStartIndex,pageEndIndex);
     setEvents(slicedEvents);
-  },[pageStartIndex,pageEndIndex,filterEvents])
-
-  const previousButton = useMemo(()=>{
     if(pageStartIndex !== 0){
-      return true;
+      previousButton.current = true;
+    }else{
+      previousButton.current = false;
     }
-    return false;
-  },[pageStartIndex]);
-
-  const nextButton = useMemo(()=>{
     if(pageEndIndex<filterEvents.length){
-      return true;
+      nextButton.current = true;
+    }else{
+      nextButton.current = false;
     }
-    return false;
-  },[pageEndIndex,filterEvents])
+    
+  },[pageStartIndex,pageEndIndex,filterEvents])
 
   const previousPageHandler = useCallback(()=>{
     setPageStartIndex(pageStartIndex - itemCount);
@@ -68,9 +82,11 @@ const EventList = props => {
           toggle = {ToggleOptStatus}
         />
       ))}
-      {previousButton && <button type="button" onClick={previousPageHandler}>Previous</button> }
-      {(previousButton || nextButton ) && " Page  "+ Math.ceil(pageStartIndex/5 + 1) + " of  " + Math.ceil(filterEvents.length/5) + "  "}
-      {nextButton && <button type="button" onClick={nextPageHandler}>Next</button> }
+      <div style={{ textAlign : 'center'}}>
+        {previousButton.current && <button type="button" onClick={previousPageHandler}>Previous</button> }
+        {(previousButton.current || nextButton.current ) && " Page  "+ Math.ceil(pageStartIndex/5 + 1) + " of  " + Math.ceil(filterEvents.length/5) + "  "}
+        {nextButton.current && <button type="button" onClick={nextPageHandler}>Next</button> }
+      </div>
     </ul>
   );
 };

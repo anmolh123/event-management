@@ -3,8 +3,8 @@
     margin: 0.25rem 0;
   }
   
-.event-item h2.is-fav {
-  color: #ff2058;
+.event-item h2.is-opt {
+  color: #7520ff;
 }
 
 .event-item p {

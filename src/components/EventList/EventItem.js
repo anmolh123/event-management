@@ -4,12 +4,14 @@ import './eventItem.css'
 import Modal from '../UI/Modal/Modal';
 import { useHistory } from "react-router-dom";
 import { UserLoginContext } from "../../context/UserLoginContext";
+import { useToasts } from 'react-toast-notifications';
 
 const EventItem = React.memo(props => {
 
   const history = useHistory();
   const [ show, setshow ] = useState(false);
   const { userId } = useContext(UserLoginContext);
+  const { addToast, removeAllToasts } = useToasts();
 
   const popDetail = useCallback(()=>{
     setshow(true);
@@ -26,27 +28,36 @@ const EventItem = React.memo(props => {
   const isOptedhandler = useCallback(()=>{
     props.toggle(props.id);
     const message = props.detail.isOpted ? 'Opted Out' : 'Opted In';
-    alert(message);
+    removeAllToasts();
+    addToast(message,{
+      appearance: 'info',
+      autoDismiss: true,
+      autoDismissTimeout: 3000,
+    })
     setshow(false);
-  },[props])
+  },[props,removeAllToasts,addToast])
 
   return (
-    <Card style={{ marginBottom: '1rem' }} >
+    <div>
+    <Card>
       <div className="event-item" onClick={popDetail}>
-        <p>Title - {props.title}</p>
+        <h2 className={props.detail.isOpted ? 'is-opt' : ''}>{props.title}</h2>
+        <p>{props.detail.date.split("-").reverse().join("-")}{" "} 
+         (<i>Start Time:{props.detail.startTime}, End Time: {props.detail.endTime}</i> )</p>
       </div>
-      <Modal show={show} handleClose={closeModal}>
-          <p>Title - {props.title}</p>
-          <p>Venue - {props.detail.venue}</p>
-          <p>Description - {props.detail.description}</p>
-          <p>Date - {props.detail.date} </p>
-          <p>Start Time - {props.detail.startTime}</p> 
-          <p>End Time - {props.detail.endTime}</p>
-          { userId === props.detail.userId && <button type="button" onClick={updateHandle}> Update </button>}
-          { userId !== props.detail.userId && <button type="button" onClick={isOptedhandler}> { props.detail.isOpted ? 'Opt-out' : 'Opt-in'} </button>}
-          {"  "}
-        </Modal>
     </Card>
+    <Modal show={show} handleClose={closeModal}>
+      <p><i>Title:</i> <b>{props.title}</b></p>
+      <p><i>Venue:</i> <b>{props.detail.venue}</b></p>
+      <p><i>Date:</i> <b>{props.detail.date.split("-").reverse().join("-")}</b> </p>
+      <p><i>Start Time:</i> <b>{props.detail.startTime}</b> </p> 
+      <p><i>End Time:</i> <b>{props.detail.endTime}</b></p>
+      <p><i>Description:</i> <b> {props.detail.description}</b></p>
+      { userId === props.detail.userId && <button type="button" onClick={updateHandle}> Update </button>}
+      { userId !== props.detail.userId && <button type="button" onClick={isOptedhandler}> { props.detail.isOpted ? 'Opt-out' : 'Opt-in'} </button>}
+      {"  "}
+    </Modal>
+    </div>   
   );
 });
 

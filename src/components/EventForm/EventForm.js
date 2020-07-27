@@ -4,6 +4,7 @@ import Card from '../UI/Card/Card';
 import { useStore } from '../../hooks-store/Store';
 import { useHistory } from 'react-router-dom';
 import { UserLoginContext } from '../../context/UserLoginContext';
+import { useToasts } from 'react-toast-notifications';
 
 const eventReducer = (state,action)=>{
 
@@ -65,6 +66,7 @@ const eventReducer = (state,action)=>{
 
 const EventForm = React.memo(props => {
 
+    const { addToast, removeAllToasts } = useToasts();
     const history = useHistory();
     const [ eventState, dispatch ] = useStore();
     const { userId } = useContext(UserLoginContext);
@@ -91,6 +93,7 @@ const EventForm = React.memo(props => {
     },[history.location.state,userId,eventState.events.length]);
 
     const titleHandler = useCallback(event => {
+        if(event.target.value.length < 31 )
         setEventElements({ type : 'ADD_TITLE', title : event.target.value});
     },[]);
 
@@ -116,17 +119,33 @@ const EventForm = React.memo(props => {
 
     const submitHandler = useCallback(event => {
         event.preventDefault();
-        if(!history.location.state){
-            dispatch('ADD_EVENT', eventElements);
-            alert('Event Added');
-            history.replace('/');
+        
+        const start = eventElements.startTime.split(':');
+        const end = eventElements.endTime.split(':');
+        console.log("start",(+start[0])*60 + (+start[1]));
+        console.log("end",(+end[0])*60 + (+end[1]));
+
+        if( (+start[0])*60 + (+start[1]) < (+end[0])*60 + (+end[1]) ){
+            
+            if(!history.location.state){
+                dispatch('ADD_EVENT', eventElements);
+                history.replace('/',{ type: 'created'});
+            }
+            else{
+                dispatch('UPDATE_EVENT', eventElements);
+                history.replace('/',{ type : 'updated'});
+            }
+            
+        }else{
+            removeAllToasts();
+            addToast(' Start Time should be less than End Time',{
+                appearance: 'info',
+                autoDismiss: true,
+                autoDismissTimeout: 2000,
+            })
         }
-        else{
-            dispatch('UPDATE_EVENT', eventElements);
-            alert('Event Updated');
-            history.replace('/');
-        }
-    },[eventElements,dispatch,history]);
+
+    },[eventElements,dispatch,history,removeAllToasts,addToast]);
 
     return(
         <div className="container">
