@@ -24,7 +24,11 @@ const UserLogin = React.memo(props => {
         removeAllToasts();
         if(userName === 'dummy' && password === 'dummy'){
             setUserId(123456);
-        }else{
+        }
+        else if(userName === 'user' && password === 'user'){
+            setUserId(333339);
+        }
+        else{
             addToast('Login Failed',{
                 appearance: 'error',
                 autoDismiss: true,

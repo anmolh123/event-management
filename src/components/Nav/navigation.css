@@ -1,9 +1,9 @@
 .main-header {
-    height: 3.5rem;
+    height: 4.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ff2058;
+    background-color: #1d055d;
   }
   
   .main-header nav {
@@ -36,6 +36,6 @@
   .main-header a:hover,
   .main-header a:active,
   .main-header a.active {
-    color: #560061;
+    color: #dafa4d;
   }
   

@@ -17,24 +17,27 @@ const EventList = props => {
   const previousButton = useRef(false);
   const history = useHistory();
   const { addToast, removeAllToasts } = useToasts();
+  
+  const alertMessage = useRef(history.location.state);
+  const historyAction = useRef(history.action);
 
   useEffect(()=>{
-    if(history.location.state){
+    if(alertMessage.current && historyAction.current === 'REPLACE'){
       removeAllToasts();
-      addToast('Event ' + history.location.state.type,{
+      addToast('Event ' + alertMessage.current.type,{
         appearance: 'success',
         autoDismiss: true,
         autoDismissTimeout: 2000,
       })
     }
-  },[history.location,addToast,removeAllToasts])
+  },[addToast,removeAllToasts])
 
   const filterEvents = useMemo(()=>{
     switch(props.filter){
       case "my" :
         return eventState.events.filter(e => userId === e.userId);
       case "opted" :
-        return eventState.events.filter(e => e.isOpted);
+        return eventState.events.filter(e => eventState.opted[e.eventId][userId] );
       default :
         return eventState.events; 
     }
@@ -68,18 +71,25 @@ const EventList = props => {
   },[pageStartIndex,pageEndIndex]);
 
   const ToggleOptStatus = useCallback((id)=>{
-    dispatch('TOGGLE_OPT',id);
+    dispatch('TOGGLE_OPT',{ eventId: id, userId : userId });
+  },[dispatch, userId]);
+
+  const deleteEvent = useCallback((id)=>{
+    dispatch('DELETE_EVENT',id);
   },[dispatch]);
   
   return (
     <ul className="list">
+      { events.length === 0 ? <h2>No Events Found!</h2>: null}
       { events.map(event => (
         <EventItem
           key={event.eventId}
           id={event.eventId}
           title={event.title}
           detail={event}
+          optStatus ={eventState.opted[event.eventId] ? eventState.opted[event.eventId][userId] : null}
           toggle = {ToggleOptStatus}
+          deleteEvent = {deleteEvent}
         />
       ))}
       <div style={{ textAlign : 'center'}}>

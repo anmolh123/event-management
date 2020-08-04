@@ -3,8 +3,12 @@
     margin: 0.25rem 0;
   }
   
-.event-item h2.is-opt {
-  color: #7520ff;
+.event-item h2.opt-yes {
+  color: #9606cf;
+}
+
+.event-item h2.opt-no {
+  color: #ee780a;
 }
 
 .event-item p {
@@ -12,4 +16,10 @@
 }
 
 .event-item { cursor: pointer; }
-  
+
+.delete-button { background-color: #962a1a; border-color: #962a1a;}
+
+.cardModal {
+  width: 80%;
+  margin: auto;
+}

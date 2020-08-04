@@ -21,13 +21,13 @@ const EventItem = React.memo(props => {
     setshow(false);
   },[]);
 
-  const updateHandle = useCallback(()=>{
+  const updateHandler = useCallback(()=>{
     history.replace('/updateEvent',props.detail);
   },[props.detail,history]);
 
-  const isOptedhandler = useCallback(()=>{
+  const isOptedHandler = useCallback(()=>{
     props.toggle(props.id);
-    const message = props.detail.isOpted ? 'Opted Out' : 'Opted In';
+    const message = props.optStatus  ? 'Opted Out' : 'Opted In';
     removeAllToasts();
     addToast(message,{
       appearance: 'info',
@@ -37,11 +37,22 @@ const EventItem = React.memo(props => {
     setshow(false);
   },[props,removeAllToasts,addToast])
 
+  const deleteHandler = useCallback(()=>{
+    props.deleteEvent(props.id);
+    removeAllToasts();
+    addToast("Event Deleted",{
+      appearance: 'info',
+      autoDismiss: true,
+      autoDismissTimeout: 3000,
+    })
+    setshow(false);
+  },[props,removeAllToasts,addToast])
+
   return (
-    <div>
+    <div className="cardModal">
     <Card>
       <div className="event-item" onClick={popDetail}>
-        <h2 className={props.detail.isOpted ? 'is-opt' : ''}>{props.title}</h2>
+        <h2 className={userId !== props.detail.userId ? ( props.optStatus ? 'opt-yes' : 'opt-no') : ''}>{props.title}</h2>
         <p>{props.detail.date.split("-").reverse().join("-")}{" "} 
          (<i>Start Time:{props.detail.startTime}, End Time: {props.detail.endTime}</i> )</p>
       </div>
@@ -53,9 +64,10 @@ const EventItem = React.memo(props => {
       <p><i>Start Time:</i> <b>{props.detail.startTime}</b> </p> 
       <p><i>End Time:</i> <b>{props.detail.endTime}</b></p>
       <p><i>Description:</i> <b> {props.detail.description}</b></p>
-      { userId === props.detail.userId && <button type="button" onClick={updateHandle}> Update </button>}
-      { userId !== props.detail.userId && <button type="button" onClick={isOptedhandler}> { props.detail.isOpted ? 'Opt-out' : 'Opt-in'} </button>}
+      { userId === props.detail.userId && <button type="button" onClick={updateHandler}> Update </button>}
+      { userId !== props.detail.userId && <button type="button" onClick={isOptedHandler}> { props.optStatus  ? 'Opt-out' : 'Opt-in'} </button>}
       {"  "}
+      { userId === props.detail.userId && <button type="button" className="delete-button" onClick={deleteHandler}> Delete </button>}
     </Modal>
     </div>   
   );

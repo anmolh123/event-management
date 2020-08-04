@@ -9,7 +9,7 @@ const Modal = React.memo(props => {
       <div className={showHideClassName}>
         <section className="modal-main">
           {props.children}
-          <button onClick={props.handleClose}>close</button>
+          <button className="modal-close" onClick={props.handleClose}>x</button>
         </section>
       </div>
     );

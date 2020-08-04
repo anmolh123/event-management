@@ -2,23 +2,33 @@ import { initStore } from './Store';
 let eventObj = null;
 
 const configureStore = () => {
+    
     const actions = {
+
         ADD_EVENT : (curState, payload) => {
-            const updatedEvents = [...curState.events];
-            updatedEvents.push({
+            const Event = [];
+            Event.push({
                 title : payload.title,
                 venue : payload.venue,
                 description : payload.description,
                 date : payload.date,
                 startTime : payload.startTime,
                 endTime : payload.endTime,
-                isOpted : payload.isOpted,
                 eventId : payload.eventId,
                 userId: payload.userId
             });
-            return { events : updatedEvents };
+            
+            const updatedOptEvents = { ...curState.opted };
+            updatedOptEvents[payload.eventId] = {};
+            const newState = {events : [...Event, ...curState.events], opted : updatedOptEvents };
+            localStorage.setItem('store',JSON.stringify(newState));
+            
+            return newState;
+
         },
+
         UPDATE_EVENT : (curState, payload) => {
+
             const eventIndex = curState.events.findIndex( e => e.eventId === payload.eventId);
             const updatedEvents = [...curState.events];
             updatedEvents[eventIndex] = {
@@ -28,23 +38,39 @@ const configureStore = () => {
                 description : payload.description,
                 date : payload.date,
                 startTime : payload.startTime,
-                endTime : payload.endTime
+                endTime : payload.endTime,
             };
-            return { events : updatedEvents };
+            const newState = { ...curState, events : updatedEvents };
+            localStorage.setItem('store',JSON.stringify(newState));
+            return newState;
+
         },
-        TOGGLE_OPT: (curState, eventId) => {
-            const eventIndex = curState.events.findIndex( e => e.eventId === eventId);
-            const newOptStatus = !curState.events[eventIndex].isOpted;
-            const updatedEvents = [...curState.events];
-            updatedEvents[eventIndex] = {
-              ...curState.events[eventIndex],
-              isOpted: newOptStatus
-            };
-            return { events: updatedEvents };
-          }
+
+        TOGGLE_OPT: (curState, { eventId, userId }) => {
+
+            const updatedOptEvents = { ...curState.opted };
+            const toggleOptStatus = updatedOptEvents[eventId][userId];
+            updatedOptEvents[eventId][userId] = !toggleOptStatus;
+            const newState = { ...curState, opted : updatedOptEvents };
+            localStorage.setItem('store',JSON.stringify(newState));
+
+            return newState;
+
+          },
+
+        DELETE_EVENT : (curState, eventId) => {
+
+            const updatedEvents = curState.events.filter( e => e.eventId !== eventId);
+            const { [eventId] : deletedObject , ...updatedOptEvents } = curState.opted;
+            const newState = { events : updatedEvents, opted: {...updatedOptEvents} }
+            localStorage.setItem('store',JSON.stringify(newState));
+            
+            return newState;
+
+        }
     };
 
-    eventObj = localStorage.getItem('event-store');
+    eventObj = localStorage.getItem('store');
     if(eventObj !== null){
     eventObj = JSON.parse(eventObj);
     }
@@ -60,7 +86,6 @@ const configureStore = () => {
                         title: "Circus",
                         userId: 333333,
                         venue: "circus central",
-                        isOpted : false
                     },
                     {
                         date: "2020-07-26",
@@ -71,7 +96,6 @@ const configureStore = () => {
                         title: "Dark Premier",
                         userId: 123456,
                         venue: "apex central",
-                        isOpted : false
                     },
                     {
                         date: "2020-07-24",
@@ -82,7 +106,6 @@ const configureStore = () => {
                         title: "Gala",
                         userId: 333339,
                         venue: "gala central",
-                        isOpted : false
                     },
                     {
                         date: "2020-07-25",
@@ -93,9 +116,14 @@ const configureStore = () => {
                         title: "Sky gazing",
                         userId: 333339,
                         venue: "gaze central",
-                        isOpted : false
                     }
-            ]
+            ],
+        opted :{
+            1 : {},
+            2 : {},
+            3 : {},
+            4 : {}
+        }
         }
     }
     initStore(actions, eventObj );

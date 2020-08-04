@@ -1,4 +1,4 @@
-import React, { useReducer, useCallback, useEffect, useContext } from 'react';
+import React, { useReducer, useCallback, useEffect, useContext, useRef } from 'react';
 import './eventForm.css'
 import Card from '../UI/Card/Card';
 import { useStore } from '../../hooks-store/Store';
@@ -68,7 +68,7 @@ const EventForm = React.memo(props => {
 
     const { addToast, removeAllToasts } = useToasts();
     const history = useHistory();
-    const [ eventState, dispatch ] = useStore();
+    const dispatch = useStore()[1];
     const { userId } = useContext(UserLoginContext);
     const [ eventElements, setEventElements ] = useReducer(eventReducer,{
                                                                             title : '',
@@ -79,18 +79,18 @@ const EventForm = React.memo(props => {
                                                                             endTime : '',
                                                                             userId : '',
                                                                             eventId : '',
-                                                                            isOpted : false
-
                                                                         });
+                                                                    
+    const previousEventState = useRef(history.location.state);
 
     useEffect(()=>{
-        if(history.location.state){
-            setEventElements({ type : 'PEVIOUS_EVENT_VALUES', payload : history.location.state});
+        if(previousEventState.current){
+            setEventElements({ type : 'PEVIOUS_EVENT_VALUES', payload : previousEventState.current});
         }else{
-            const eventSize = eventState.events.length + 1;
-            setEventElements({ type : 'SET_ID', userId : userId, eventId : eventSize})
+            const eventId = Math.floor(Math.random() * Math.floor(Math.random() * Date.now()));
+            setEventElements({ type : 'SET_ID', userId : userId, eventId : eventId})
         }
-    },[history.location.state,userId,eventState.events.length]);
+    },[userId]);
 
     const titleHandler = useCallback(event => {
         if(event.target.value.length < 31 )
@@ -122,8 +122,6 @@ const EventForm = React.memo(props => {
         
         const start = eventElements.startTime.split(':');
         const end = eventElements.endTime.split(':');
-        console.log("start",(+start[0])*60 + (+start[1]));
-        console.log("end",(+end[0])*60 + (+end[1]));
 
         if( (+start[0])*60 + (+start[1]) < (+end[0])*60 + (+end[1]) ){
             
