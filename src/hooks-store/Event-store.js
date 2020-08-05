@@ -17,10 +17,7 @@ const configureStore = () => {
                 eventId : payload.eventId,
                 userId: payload.userId
             });
-            
-            const updatedOptEvents = { ...curState.opted };
-            updatedOptEvents[payload.eventId] = {};
-            const newState = {events : [...Event, ...curState.events], opted : updatedOptEvents };
+            const newState = { ...curState, events : [...Event, ...curState.events] };
             localStorage.setItem('store',JSON.stringify(newState));
             
             return newState;
@@ -49,8 +46,13 @@ const configureStore = () => {
         TOGGLE_OPT: (curState, { eventId, userId }) => {
 
             const updatedOptEvents = { ...curState.opted };
-            const toggleOptStatus = updatedOptEvents[eventId][userId];
-            updatedOptEvents[eventId][userId] = !toggleOptStatus;
+
+            if(updatedOptEvents[eventId]){
+                updatedOptEvents[eventId][userId] = !updatedOptEvents[eventId][userId];
+            }else{
+                updatedOptEvents[eventId] = { [userId] : true }
+            }
+            
             const newState = { ...curState, opted : updatedOptEvents };
             localStorage.setItem('store',JSON.stringify(newState));
 
@@ -118,12 +120,7 @@ const configureStore = () => {
                         venue: "gaze central",
                     }
             ],
-        opted :{
-            1 : {},
-            2 : {},
-            3 : {},
-            4 : {}
-        }
+        opted :{}
         }
     }
     initStore(actions, eventObj );

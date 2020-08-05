@@ -37,7 +37,7 @@ const EventList = props => {
       case "my" :
         return eventState.events.filter(e => userId === e.userId);
       case "opted" :
-        return eventState.events.filter(e => eventState.opted[e.eventId][userId] );
+        return eventState.events.filter(e => eventState.opted[e.eventId] ? eventState.opted[e.eventId][userId] : false );
       default :
         return eventState.events; 
     }
