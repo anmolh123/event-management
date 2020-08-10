@@ -1,25 +1,22 @@
-import React, { useState, useCallback, useContext, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import Card from '../UI/Card/Card';
 import './userLogin.css';
-import { UserLoginContext } from '../../context/UserLoginContext';
 import { useToasts } from 'react-toast-notifications';
 import { useHistory } from 'react-router';
 
-const UserLogin = React.memo(props => {    
+const UserSignUp = React.memo(props => {    
 
     const [ userName, setUserName ] = useState('');
     const [ password, setPassword ] = useState('');
-    const { setUserId } = useContext(UserLoginContext);
+    const [ name, setName ] = useState('');
     const { addToast, removeAllToasts } = useToasts();
     const history = useHistory();
-    const users = useRef({});
+    const users =useRef({});
 
     useEffect(()=>{
-        const id = parseInt(localStorage.getItem('userId'));
-        users.current = JSON.parse(localStorage.getItem('users'));
-        if(id)
-            setUserId(id);
-    },[setUserId]);
+        const usersJson = JSON.parse(localStorage.getItem('users'));
+        users.current = usersJson;
+    },[]);
 
     const userNameHandler = useCallback(event => {
         setUserName(event.target.value);
@@ -29,36 +26,49 @@ const UserLogin = React.memo(props => {
         setPassword(event.target.value);
     }, []);
 
-    const errorHandler = useCallback(()=>{
-        addToast('Login Failed',{
-            appearance: 'error',
-            autoDismiss: true,
-            autoDismissTimeout: 1000,
-            })
-        setUserName('');
-        setPassword('');
-    },[addToast])
+    const nameHandler = useCallback( event =>{
+        setName(event.target.value);
+    }, []);
 
-    const loginHandler = useCallback(event =>{
+    const signUpHandler = useCallback(event =>{
         event.preventDefault();
         removeAllToasts();
-        if( users.current[userName] ){
-            if(users.current[userName].password === password){
-                setUserId(users.current[userName].userId);
-                localStorage.setItem('userId',users.current[userName].userId);
-                history.replace('/');
-            }else{
-                errorHandler();
-            }
-        }else{
-            errorHandler();
+        if(name === '' || userName === '' || password === ''){
+            addToast(' Enter Valid Inputs ',{
+                appearance: 'error',
+                autoDismiss: true,
+                autoDismissTimeout: 1000,
+              })
         }
-    },[userName, password, history, errorHandler, setUserId, removeAllToasts]);
+        else if(users.current[userName]){
+            addToast(' User name Exists ',{
+                appearance: 'error',
+                autoDismiss: true,
+                autoDismissTimeout: 1000,
+              })
+        }else{
+            const userId = Math.floor(Math.random() * Math.floor(Math.random() * Date.now()));
+            const userDetailObj = { password, name, userId };
+            localStorage.setItem('users',JSON.stringify({...users.current, [userName]: userDetailObj }));
+            history.replace('/');
+        }
+
+    },[userName, password, name, history, addToast,removeAllToasts]);
 
     return (
         <section className="login-form">
         <Card>
             <form>
+            <div className="form-control">
+                <label htmlFor="name">Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    autoComplete="off"
+                    value={name}
+                    onChange={nameHandler} 
+                />
+            </div>
             <div className="form-control">
                 <label htmlFor="userName">User Name</label>
                 <input
@@ -83,15 +93,7 @@ const UserLogin = React.memo(props => {
                 <button 
                     className="button"
                     type="button" 
-                    onClick={loginHandler}
-                >
-                    Login
-                </button>
-                <button 
-                    className="button"
-                    type="button"
-                    onClick={ ()=> history.replace('/signUp') }
-                    style={{background:'#eee', borderColor: '#eee', color:'black', marginLeft: '20px'}}                     
+                    onClick={signUpHandler}
                 >
                     Sign-Up
                 </button>
@@ -103,4 +105,4 @@ const UserLogin = React.memo(props => {
     );
 });
 
-export default UserLogin;
+export default UserSignUp;

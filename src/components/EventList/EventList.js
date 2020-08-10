@@ -33,13 +33,27 @@ const EventList = props => {
   },[addToast,removeAllToasts])
 
   const filterEvents = useMemo(()=>{
+    setPageStartIndex(0);
+    setPageEndIndex(itemCount);
     switch(props.filter){
       case "my" :
-        return eventState.events.filter(e => userId === e.userId);
+        return eventState.events.filter(event => userId === event.userId);
+      
       case "opted" :
-        return eventState.events.filter(e => eventState.opted[e.eventId] ? eventState.opted[e.eventId][userId] : false );
+        return eventState.events.filter(event => eventState.opted[event.eventId] ? eventState.opted[event.eventId][userId] : false );
+      
+      case "demand" :
+        return eventState.events.filter(event => {        
+            if(event.userId === userId){
+              for( const obj in eventState.opted[event.eventId] ){
+                return true;
+              }
+            }   
+            return false;
+          }); 
+
       default :
-        return eventState.events; 
+        return eventState.events;    
     }
   },[eventState,props.filter,userId])
 
@@ -58,7 +72,7 @@ const EventList = props => {
       nextButton.current = false;
     }
     
-  },[pageStartIndex,pageEndIndex,filterEvents])
+  },[pageStartIndex,pageEndIndex,filterEvents]);
 
   const previousPageHandler = useCallback(()=>{
     setPageStartIndex(pageStartIndex - itemCount);
@@ -90,6 +104,8 @@ const EventList = props => {
           optStatus ={eventState.opted[event.eventId] ? eventState.opted[event.eventId][userId] : null}
           toggle = {ToggleOptStatus}
           deleteEvent = {deleteEvent}
+          demand = { props.filter==="demand"? true: false }
+          usersMappings={props.usersMappings}
         />
       ))}
       <div style={{ textAlign : 'center'}}>

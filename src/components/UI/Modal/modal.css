@@ -7,6 +7,10 @@
     background: rgba(0, 0, 0, 0.6);
     text-align: center;
   }
+  .modal h2 {
+    font-size: 1.15rem;
+    margin: 0.25rem 0;
+  }
   
   .modal-main {
     position:fixed;

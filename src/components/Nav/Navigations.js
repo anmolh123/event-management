@@ -20,6 +20,12 @@ const Navigation = props => {
           <li>
             <NavLink to="/optedEvents">Opted Events</NavLink>
           </li>
+          <li>
+            <NavLink to="/demand">In-Demand</NavLink>
+          </li>
+          <li>
+            <NavLink to="/logout">Logout</NavLink>
+          </li>
         </ul>
       </nav>
     </header>

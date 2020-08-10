@@ -45,28 +45,50 @@ const configureStore = () => {
 
         TOGGLE_OPT: (curState, { eventId, userId }) => {
 
-            const updatedOptEvents = { ...curState.opted };
+            let updatedOptEvents = { ...curState.opted };
 
             if(updatedOptEvents[eventId]){
-                updatedOptEvents[eventId][userId] = !updatedOptEvents[eventId][userId];
+
+                if(updatedOptEvents[eventId][userId]){                   
+                    const { [userId] : deletedValue, ...OptStatus } = updatedOptEvents[eventId];
+                    if(Object.keys(OptStatus).length !== 0 )
+                        updatedOptEvents[eventId] = OptStatus;
+                    else{
+                        const { [eventId] : deletedObject , ...OptEventsStatus } = curState.opted;
+                        updatedOptEvents = OptEventsStatus;
+                    }
+                }else{
+                    updatedOptEvents[eventId] = { ...updatedOptEvents[eventId],[userId] : true }
+                }
+              
             }else{
                 updatedOptEvents[eventId] = { [userId] : true }
             }
             
             const newState = { ...curState, opted : updatedOptEvents };
             localStorage.setItem('store',JSON.stringify(newState));
-
+            
             return newState;
 
           },
 
         DELETE_EVENT : (curState, eventId) => {
-
-            const updatedEvents = curState.events.filter( e => e.eventId !== eventId);
+            let deletedEvents = {}; 
+            const updatedEvents = curState.events.filter( event => { 
+                if(event.eventId === eventId){
+                    deletedEvents = {...event}
+                }
+                return event.eventId !== eventId;
+            }); 
             const { [eventId] : deletedObject , ...updatedOptEvents } = curState.opted;
             const newState = { events : updatedEvents, opted: {...updatedOptEvents} }
             localStorage.setItem('store',JSON.stringify(newState));
             
+            if( deletedObject !== undefined ){
+                const notifications = JSON.parse(localStorage.getItem('notify'));
+                localStorage.setItem('notify',JSON.stringify({ queue : [ ...notifications.queue, {...deletedObject, "message": deletedEvents }]}))
+            }
+
             return newState;
 
         }
@@ -122,8 +144,19 @@ const configureStore = () => {
             ],
         opted :{}
         }
+    localStorage.setItem('store',JSON.stringify(eventObj));
     }
     initStore(actions, eventObj );
+
+    let checkLocalStorage = localStorage.getItem('notify');
+    if(!checkLocalStorage){
+        localStorage.setItem('notify','{"queue":[]}');
+    }
+    checkLocalStorage = localStorage.getItem('users');
+    if(!checkLocalStorage){
+        localStorage.setItem('users','{}');
+    }
+    checkLocalStorage = localStorage.getItem('userId');
   };
   
   export default configureStore;

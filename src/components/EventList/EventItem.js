@@ -1,10 +1,11 @@
 import React, { useCallback, useState, useContext } from 'react';
 import Card from '../UI/Card/Card';
-import './eventItem.css'
+import './eventItem.css';
 import Modal from '../UI/Modal/Modal';
 import { useHistory } from "react-router-dom";
 import { UserLoginContext } from "../../context/UserLoginContext";
 import { useToasts } from 'react-toast-notifications';
+import { useStore } from '../../hooks-store/Store';
 
 const EventItem = React.memo(props => {
 
@@ -12,6 +13,7 @@ const EventItem = React.memo(props => {
   const [ show, setshow ] = useState(false);
   const { userId } = useContext(UserLoginContext);
   const { addToast, removeAllToasts } = useToasts();
+  const [ eventState ] = useStore();
 
   const popDetail = useCallback(()=>{
     setshow(true);
@@ -48,15 +50,7 @@ const EventItem = React.memo(props => {
     setshow(false);
   },[props,removeAllToasts,addToast])
 
-  return (
-    <div className="cardModal">
-    <Card>
-      <div className="event-item" onClick={popDetail}>
-        <h2 className={userId !== props.detail.userId ? ( props.optStatus ? 'opt-yes' : 'opt-no') : ''}>{props.title}</h2>
-        <p>{props.detail.date.split("-").reverse().join("-")}{" "} 
-         (<i>Start Time:{props.detail.startTime}, End Time: {props.detail.endTime}</i> )</p>
-      </div>
-    </Card>
+  let ModelContent = (
     <Modal show={show} handleClose={closeModal}>
       <p><i>Title:</i> <b>{props.title}</b></p>
       <p><i>Venue:</i> <b>{props.detail.venue}</b></p>
@@ -69,6 +63,41 @@ const EventItem = React.memo(props => {
       {"  "}
       { userId === props.detail.userId && <button type="button" className="delete-button" onClick={deleteHandler}> Delete </button>}
     </Modal>
+  );
+
+  if(props.demand){
+    
+    ModelContent =(
+      <Modal show={show} handleClose={closeModal}>
+        <h2> Users Opted: {props.title}</h2>
+        <ol style={{textAlign : 'left'}}>
+          { props.usersMappings && 
+            eventState.opted[props.detail.eventId] &&
+
+            Object.keys(eventState.opted[props.detail.eventId]).map( userId =>( 
+              <li key={userId}>
+                  {props.usersMappings[userId]}
+              </li>
+          
+          ))
+          }
+        </ol>
+        <p>{" "}</p>
+      </Modal>
+    );
+
+  }
+
+  return (
+    <div className="cardModal">
+    <Card>
+      <div className="event-item" onClick={popDetail}>
+        <h2 className={userId !== props.detail.userId ? ( props.optStatus ? 'opt-yes' : 'opt-no') : ''}>{props.title}</h2>
+        <p>{props.detail.date.split("-").reverse().join("-")}{" "} 
+         (<i>Start Time:{props.detail.startTime}, End Time: {props.detail.endTime}</i> )</p>
+      </div>
+    </Card>
+    {ModelContent}
     </div>   
   );
 });
